@@ -13,9 +13,19 @@
         display: none;
       }
     </style>
+    <script
+      defer
+      src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"
+    ></script>
+    <script
+      src="https://cdnjs.cloudflare.com/ajax/libs/pocketbase/0.8.0-rc1/pocketbase.umd.js"
+      integrity="sha512-rXvsONe8nnMbEMubzO3Oj1mXbromnFXo7jtDekeUJ4ZJ1UuJTc/HZ7qgTLw8oL6vdfxy3NL35slBflsaEwUhpw=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    ></script>
   </head>
   <body class="bg-gray-200">
-    <div x-data="{ currentPage: 'Learn', open: false}" x-cloak>
+    <div x-data="state()" x-cloak>
       <div
         class="w-full text-gray-700 bg-white dark-mode:text-gray-200 dark-mode:bg-gray-800"
       >
@@ -35,17 +45,17 @@
             </a>
             <button
               class="md:hidden rounded-lg focus:outline-none focus:shadow-outline"
-              @click="open = !open"
+              @click="state.open = !state.open"
             >
               <svg fill="currentColor" viewBox="0 0 20 20" class="w-6 h-6">
                 <path
-                  x-show="!open"
+                  x-show="!state.open"
                   fill-rule="evenodd"
                   d="M3 5a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM3 10a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM9 15a1 1 0 011-1h6a1 1 0 110 2h-6a1 1 0 01-1-1z"
                   clip-rule="evenodd"
                 ></path>
                 <path
-                  x-show="open"
+                  x-show="state.open"
                   fill-rule="evenodd"
                   d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
                   clip-rule="evenodd"
@@ -54,39 +64,93 @@
             </button>
           </div>
           <nav
-            :class="{'flex': open, 'hidden': !open}"
+            :class="{'flex': state.open, 'hidden': !state.open}"
             class="flex-col flex-grow pb-4 md:pb-0 hidden md:flex md:justify-end md:flex-row"
           >
             <a
               class="cursor-pointer px-4 py-2 mt-2 text-sm font-semibold bg-transparent rounded-lg dark-mode:bg-transparent dark-mode:hover:text-white dark-mode:text-gray-200 md:mt-0 md:ml-4 focus:outline-none focus:shadow-outline"
-              :class="{ 'bg-gray-200 text-gray-900': currentPage === 'Learn', 'text-gray-900': currentPage !== 'Learn' }"
-              @click="currentPage = 'Learn'"
+              :class="{ 'bg-gray-200 text-gray-900': state.currentPage === 'Learn', 'text-gray-900': state.currentPage !== 'Learn' }"
+              @click="state.currentPage = 'Learn'"
               >Learn</a
             >
             <a
               class="cursor-pointer px-4 py-2 mt-2 text-sm font-semibold bg-transparent rounded-lg dark-mode:bg-transparent dark-mode:hover:text-white dark-mode:text-gray-200 md:mt-0 md:ml-4 focus:outline-none focus:shadow-outline"
-              :class="{ 'bg-gray-200 text-gray-900': currentPage === 'Stats', 'text-gray-900': currentPage !== 'Stats' }"
-              @click="currentPage = 'Stats'"
+              :class="{ 'bg-gray-200 text-gray-900': state.currentPage === 'Stats', 'text-gray-900': state.currentPage !== 'Stats' }"
+              @click="state.currentPage = 'Stats'"
               >Stats</a
             >
           </nav>
         </div>
       </div>
 
-      <div x-show="currentPage === 'Learn'">
+      <div x-show="state.currentPage === 'Learn'">
         <h1 class="text-2xl font-bold mt-8">Learn Page</h1>
         <p>Welcome to the Home Page</p>
       </div>
 
-      <div x-show="currentPage === 'Stats'">
+      <div x-show="state.currentPage === 'Stats'">
         <h1 class="text-2xl font-bold mt-8">Stats Page</h1>
-        <p>About Us</p>
+        <p @click="testClick()">About Us</p>
+      </div>
+
+      <div x-show="state.currentPage === 'Login'">
+        <h1 class="text-2xl font-bold mt-8">Login Page</h1>
+        <p>Login</p>
+
+        <button
+          class="flex items-center bg-white dark:bg-gray-900 border border-gray-300 rounded-lg shadow-md px-6 py-2 text-sm font-medium text-gray-800 dark:text-white hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500"
+          @click="loginGoogle"
+        >
+          <svg
+            class="h-6 w-6 mr-2"
+            xmlns="http://www.w3.org/2000/svg"
+            xmlns:xlink="http://www.w3.org/1999/xlink"
+            width="800px"
+            height="800px"
+            viewBox="-0.5 0 48 48"
+            version="1.1"
+          >
+            <title>Google-color</title>
+            <desc>Created with Sketch.</desc>
+            <defs></defs>
+            <g
+              id="Icons"
+              stroke="none"
+              stroke-width="1"
+              fill="none"
+              fill-rule="evenodd"
+            >
+              <g id="Color-" transform="translate(-401.000000, -860.000000)">
+                <g id="Google" transform="translate(401.000000, 860.000000)">
+                  <path
+                    d="M9.82727273,24 C9.82727273,22.4757333 10.0804318,21.0144 10.5322727,19.6437333 L2.62345455,13.6042667 C1.08206818,16.7338667 0.213636364,20.2602667 0.213636364,24 C0.213636364,27.7365333 1.081,31.2608 2.62025,34.3882667 L10.5247955,28.3370667 C10.0772273,26.9728 9.82727273,25.5168 9.82727273,24"
+                    id="Fill-1"
+                    fill="#FBBC05"
+                  ></path>
+                  <path
+                    d="M23.7136364,10.1333333 C27.025,10.1333333 30.0159091,11.3066667 32.3659091,13.2266667 L39.2022727,6.4 C35.0363636,2.77333333 29.6954545,0.533333333 23.7136364,0.533333333 C14.4268636,0.533333333 6.44540909,5.84426667 2.62345455,13.6042667 L10.5322727,19.6437333 C12.3545909,14.112 17.5491591,10.1333333 23.7136364,10.1333333"
+                    id="Fill-2"
+                    fill="#EB4335"
+                  ></path>
+                  <path
+                    d="M23.7136364,37.8666667 C17.5491591,37.8666667 12.3545909,33.888 10.5322727,28.3562667 L2.62345455,34.3946667 C6.44540909,42.1557333 14.4268636,47.4666667 23.7136364,47.4666667 C29.4455,47.4666667 34.9177955,45.4314667 39.0249545,41.6181333 L31.5177727,35.8144 C29.3995682,37.1488 26.7323182,37.8666667 23.7136364,37.8666667"
+                    id="Fill-3"
+                    fill="#34A853"
+                  ></path>
+                  <path
+                    d="M46.1454545,24 C46.1454545,22.6133333 45.9318182,21.12 45.6113636,19.7333333 L23.7136364,19.7333333 L23.7136364,28.8 L36.3181818,28.8 C35.6879545,31.8912 33.9724545,34.2677333 31.5177727,35.8144 L39.0249545,41.6181333 C43.3393409,37.6138667 46.1454545,31.6490667 46.1454545,24"
+                    id="Fill-4"
+                    fill="#4285F4"
+                  ></path>
+                </g>
+              </g>
+            </g>
+          </svg>
+          <span>Continue with Google</span>
+        </button>
       </div>
     </div>
 
-    <script
-      src="https://cdn.jsdelivr.net/npm/alpinejs@2.8.2/dist/alpine.min.js"
-      defer
-    ></script>
+    <script src="index.js"></script>
   </body>
 </html>
