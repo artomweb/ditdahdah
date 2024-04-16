@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   width="210mm"
+   height="297mm"
+   viewBox="0 0 210 297"
+   version="1.1"
+   id="svg1"
+   inkscape:version="1.3 (0e150ed6c4, 2023-07-21)"
+   sodipodi:docname="ditDahDahNoWords.svg"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview1"
+     pagecolor="#c4c7ee"
+     bordercolor="#000000"
+     borderopacity="0.25"
+     inkscape:showpageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#d1d1d1"
+     inkscape:document-units="mm"
+     inkscape:zoom="1.0242632"
+     inkscape:cx="265.55674"
+     inkscape:cy="708.31402"
+     inkscape:window-width="1920"
+     inkscape:window-height="1009"
+     inkscape:window-x="2872"
+     inkscape:window-y="-8"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="layer1" />
+  <defs
+     id="defs1" />
+  <g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1">
+    <circle
+       style="fill:#f9f9f9;stroke-width:6.43901;stroke-linecap:round"
+       id="path1"
+       cx="100.82656"
+       cy="83.291519"
+       r="50.04797"
+       inkscape:export-filename="ditDahDahNoWords.png"
+       inkscape:export-xdpi="96"
+       inkscape:export-ydpi="96" />
+    <circle
+       style="fill:#000000;stroke-width:5.87335;stroke-linecap:round"
+       id="path2"
+       cx="67.160088"
+       cy="82.673622"
+       r="6.9976501" />
+    <rect
+       style="fill:#000000;stroke-width:5.87335;stroke-linecap:round"
+       id="rect2"
+       width="27.803534"
+       height="11.663345"
+       x="78.958084"
+       y="76.841942"
+       ry="1.0650148" />
+    <rect
+       style="fill:#000000;stroke-width:5.87335;stroke-linecap:round"
+       id="rect3"
+       width="27.803534"
+       height="11.663345"
+       x="135.7061"
+       y="33.361561"
+       ry="1.0650148"
+       transform="rotate(20.228629)" />
+    <circle
+       style="fill:#f9f9f9;stroke-width:6.43901;stroke-linecap:round"
+       id="circle3"
+       cx="100.82656"
+       cy="198.54797"
+       r="50.04797"
+       inkscape:export-filename="ditDahDahNoWords.png"
+       inkscape:export-xdpi="96"
+       inkscape:export-ydpi="96" />
+    <circle
+       style="fill:#000000;stroke-width:28.6387;stroke-linecap:round"
+       id="circle4"
+       cx="100.82656"
+       cy="198.54797"
+       r="34.120804" />
+  </g>
+</svg>
