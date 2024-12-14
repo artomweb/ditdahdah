@@ -1,9 +1,15 @@
 /** @type {import('tailwindcss').Config} */
 module.exports = {
-  darkMode: "class",
-  content: ["./src/**/*.{html,js}"],
+  content: [
+    "./index.html", // If your HTML is at the root
+    "/src/**/*.{html,js}", // If your HTML or JS is inside the `src` folder
+    "./script.js",
+  ],
   theme: {
     extend: {},
   },
-  plugins: [],
+  plugins: [require("daisyui")],
+  daisyui: {
+    themes: ["cupcake"],
+  },
 };

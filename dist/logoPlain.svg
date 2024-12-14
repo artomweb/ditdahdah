@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   width="297mm"
+   height="100mm"
+   viewBox="0 0 297 100"
+   version="1.1"
+   id="svg1"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <defs
+     id="defs1" />
+  <g
+     id="layer1">
+    <text
+       xml:space="preserve"
+       style="font-weight:bold;font-size:38.2959px;font-family:Arial;-inkscape-font-specification:'Arial Bold';text-align:center;text-anchor:middle;fill:#000000;stroke:none;stroke-width:5.52123;stroke-linecap:round"
+       x="64.884193"
+       y="55.527206"
+       id="text1"><tspan
+         id="tspan1"
+         style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:38.2959px;font-family:Arial;-inkscape-font-specification:'Arial, Bold';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;fill:#000000;stroke:none;stroke-width:5.52124"
+         x="64.884193"
+         y="55.527206">Dit</tspan></text>
+    <circle
+       style="fill:#000000;stroke:none;stroke-width:3.53165;stroke-linecap:round;stroke-dasharray:none"
+       id="path1"
+       cx="66.034195"
+       cy="68.780876"
+       r="3.1048334" />
+    <path
+       style="fill:#000000;stroke:#000000;stroke-width:6.2098;stroke-linecap:round;stroke-dasharray:none;stroke-opacity:1"
+       d="m 130.71168,68.780874 h 16.39128"
+       id="path2" />
+    <path
+       style="fill:#000000;stroke:#000000;stroke-width:6.2098;stroke-linecap:round;stroke-dasharray:none;stroke-opacity:1"
+       d="m 213.17749,68.780874 h 16.39127"
+       id="path3" />
+    <text
+       xml:space="preserve"
+       style="font-weight:bold;font-size:38.2959px;font-family:Arial;-inkscape-font-specification:'Arial Bold';text-align:center;text-anchor:middle;fill:#000000;stroke:none;stroke-width:5.52123;stroke-linecap:round"
+       x="138.81384"
+       y="55.527206"
+       id="text3"><tspan
+         id="tspan3"
+         style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:38.2959px;font-family:Arial;-inkscape-font-specification:'Arial, Bold';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;fill:#000000;stroke:none;stroke-width:5.52124"
+         x="138.81384"
+         y="55.527206">Dah</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-weight:bold;font-size:38.2959px;font-family:Arial;-inkscape-font-specification:'Arial Bold';text-align:center;text-anchor:middle;fill:#000000;stroke:none;stroke-width:5.52123;stroke-linecap:round"
+       x="221.27965"
+       y="55.527206"
+       id="text4"><tspan
+         id="tspan4"
+         style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:38.2959px;font-family:Arial;-inkscape-font-specification:'Arial, Bold';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;fill:#000000;stroke:none;stroke-width:5.52124"
+         x="221.27965"
+         y="55.527206">Dah</tspan></text>
+  </g>
+</svg>
