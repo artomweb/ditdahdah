@@ -67,74 +67,100 @@
       <div
         id="settings"
         class="transition-opacity duration-500 opacity-0 hidden">
-        <div class="container mx-auto p-8 max-w-md">
-          <!-- Form for selecting character types and controlling pitch/speed -->
-          <div class="bg-white p-6 rounded-lg shadow-lg mb-8">
-            <div class="space-y-4">
-              <!-- Radio Buttons: Number, Symbol, Both, None -->
-              <div class="flex flex-col space-y-2 w-1/2 mx-auto">
-                <div class="form-control">
-                  <label class="label cursor-pointer">
-                    <span class="label-text">Numbers</span>
-                    <input
-                      type="checkbox"
-                      name="Numbers"
-                      id="Numbers"
-                      class="checkbox checkbox-primary" />
-                  </label>
-                </div>
-                <div class="form-control">
-                  <label class="label cursor-pointer">
-                    <span class="label-text">Symbols</span>
-                    <input
-                      type="checkbox"
-                      name="Symbols"
-                      id="Symbols"
-                      class="checkbox checkbox-primary" />
-                  </label>
-                </div>
-              </div>
-
-              <!-- Sliders for controlling pitch and speed -->
+        <div class="container mx-auto p-8 max-w-4xl flex justify-center">
+          <!-- Settings and Hints Section Wrapper -->
+          <div
+            class="grid grid-cols-1 lg:grid-cols-2 gap-8 max-w-md lg:max-w-7xl">
+            <!-- Settings Section -->
+            <div class="bg-white p-6 rounded-lg shadow-lg">
               <div class="space-y-4">
-                <!-- Pitch Slider -->
-                <div>
-                  <label for="pitch" class="label">
-                    <span class="">Pitch</span>
-                  </label>
-                  <input
-                    type="range"
-                    id="pitch"
-                    name="pitch"
-                    min="300"
-                    max="1500"
-                    value="500"
-                    class="range range-sm range-primary w-full" />
-                  <div class="flex justify-between label-text-alt">
-                    <span>Low</span>
-                    <span>High</span>
+                <!-- Radio Buttons: Number, Symbol, Both, None -->
+                <div class="flex flex-col space-y-2 w-1/2">
+                  <div class="form-control">
+                    <label class="label cursor-pointer">
+                      <span class="label-text">Numbers</span>
+                      <input
+                        type="checkbox"
+                        name="Numbers"
+                        id="Numbers"
+                        class="checkbox checkbox-primary" />
+                    </label>
+
+                    <label class="label cursor-pointer">
+                      <span class="label-text">Symbols</span>
+                      <input
+                        type="checkbox"
+                        name="Symbols"
+                        id="Symbols"
+                        class="checkbox checkbox-primary" />
+                    </label>
                   </div>
                 </div>
 
-                <!-- Speed Slider -->
-                <div>
-                  <label for="speed" class="label">
-                    <span class="">Speed</span>
-                  </label>
-                  <input
-                    type="range"
-                    id="speed"
-                    name="speed"
-                    min="20"
-                    max="100"
-                    value="25"
-                    class="range range-sm range-primary w-full" />
-                  <div class="flex justify-between label-text-alt">
-                    <span>Slow</span>
-                    <span>Fast</span>
+                <!-- Sliders for controlling pitch and speed -->
+                <div class="space-y-2">
+                  <!-- Pitch Slider -->
+                  <div>
+                    <div class="label">
+                      <span class="label-text">Pitch</span>
+                    </div>
+                    <input
+                      type="range"
+                      id="pitch"
+                      name="pitch"
+                      min="300"
+                      max="1500"
+                      value="500"
+                      class="range range-sm range-primary w-full" />
+                    <div class="label">
+                      <span class="label-text-alt">Low</span>
+                      <span class="label-text-alt">High</span>
+                    </div>
+                  </div>
+
+                  <!-- Speed Slider -->
+                  <div>
+                    <div class="label">
+                      <span class="label-text">Speed</span>
+                    </div>
+                    <input
+                      type="range"
+                      id="speed"
+                      name="speed"
+                      min="20"
+                      max="100"
+                      value="25"
+                      class="range range-sm range-primary w-full" />
+                    <div class="label">
+                      <span class="label-text-alt">Slow</span>
+                      <span class="label-text-alt">Fast</span>
+                    </div>
                   </div>
                 </div>
               </div>
+            </div>
+
+            <!-- Hints Section -->
+            <div
+              class="bg-blue-100 border border-blue-300 text-blue-800 p-4 rounded-lg shadow-md">
+              <h1 class="text-xl font-semibold mb-2">Hints</h1>
+              <ul class="list-disc pl-5 space-y-2">
+                <li>
+                  You can
+                  <span class="font-bold">click on the graph</span>
+                  to hear the characters.
+                </li>
+                <li>
+                  Use the checkboxes to include or exclude
+                  <span class="font-bold">numbers</span>
+                  and
+                  <span class="font-bold mr-0">symbols.</span>
+                </li>
+                <li>
+                  Click away from the input to take a
+                  <span class="font-bold mr-0">break.</span>
+                </li>
+              </ul>
             </div>
           </div>
         </div>

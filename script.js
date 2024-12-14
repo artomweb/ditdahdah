@@ -276,6 +276,7 @@ function repeatMorseCode(char) {
     m.stop();
   }
   m.play(char);
+  charStartTime = new Date().getTime();
   answerBox.value = answerBox.value += char;
   currentCharAttempts++;
 }
@@ -291,7 +292,7 @@ answerBox.addEventListener("keydown", (event) => {
   char = char.toUpperCase();
 
   const character = sessionScores.find((c) => c.char === currentChar);
-  character.attempts++;
+
   // Check if the pressed key is a letter, number, or punctuation
   if (
     char.length === 1 &&
@@ -311,6 +312,7 @@ answerBox.addEventListener("keydown", (event) => {
       currentCharAttempts = 0;
       clearTimeout(replayInterval);
       const newResponseTime = new Date().getTime() - charStartTime;
+      character.attempts++;
       character.avgResponseTime =
         (character.avgResponseTime * (character.attempts - 1) +
           newResponseTime) /
