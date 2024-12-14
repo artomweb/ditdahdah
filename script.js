@@ -1,52 +1,14 @@
-let allCharacters = [
-  { char: "Q", type: "letter", error: 255, active: true },
-  { char: "7", type: "number", error: 255, active: true },
-  { char: "Z", type: "letter", error: 255, active: true },
-  { char: "G", type: "letter", error: 255, active: true },
-  { char: "0", type: "number", error: 255, active: false },
-  { char: "9", type: "number", error: 255, active: false },
-  { char: "8", type: "number", error: 255, active: false },
-  { char: "O", type: "letter", error: 255, active: false },
-  { char: "1", type: "number", error: 255, active: false },
-  { char: "J", type: "letter", error: 255, active: false },
-  { char: "P", type: "letter", error: 255, active: false },
-  { char: "W", type: "letter", error: 255, active: false },
-  { char: ".", type: "symbol", error: 255, active: false },
-  { char: "L", type: "letter", error: 255, active: false },
-  { char: "R", type: "letter", error: 255, active: false },
-  { char: "A", type: "letter", error: 255, active: false },
-  { char: "M", type: "letter", error: 255, active: false },
-  { char: "6", type: "number", error: 255, active: false },
-  { char: "B", type: "letter", error: 255, active: false },
-  { char: "/", type: "symbol", error: 255, active: false },
-  { char: "X", type: "letter", error: 255, active: false },
-  { char: "D", type: "letter", error: 255, active: false },
-  { char: "=", type: "symbol", error: 255, active: false },
-  { char: "Y", type: "letter", error: 255, active: false },
-  { char: "C", type: "letter", error: 255, active: false },
-  { char: "K", type: "letter", error: 255, active: false },
-  { char: "N", type: "letter", error: 255, active: false },
-  { char: "2", type: "number", error: 255, active: false },
-  { char: "3", type: "number", error: 255, active: false },
-  { char: "?", type: "symbol", error: 255, active: false },
-  { char: "F", type: "letter", error: 255, active: false },
-  { char: "U", type: "letter", error: 255, active: false },
-  { char: "4", type: "number", error: 255, active: false },
-  { char: "5", type: "number", error: 255, active: false },
-  { char: "V", type: "letter", error: 255, active: false },
-  { char: "H", type: "letter", error: 255, active: false },
-  { char: "S", type: "letter", error: 255, active: false },
-  { char: "I", type: "letter", error: 255, active: false },
-  { char: "T", type: "letter", error: 255, active: false },
-  { char: "E", type: "letter", error: 255, active: false },
-];
-
 let statsPage = document.getElementById("stats");
 let settingsPage = document.getElementById("settings");
 let learnPage = document.getElementById("learn");
+let answerBox = document.getElementById("answerBox");
 
+let currentChar = "";
 let allScores = [];
 let sessionScores = [];
+let replayInterval;
+let currentCharAttempts = 0;
+let charStartTime = 0;
 
 function saveAllScores() {
   sessionScores.forEach((sessionScore) => {
@@ -295,25 +257,41 @@ function updateLocalStorage() {
   localStorage.setItem("userSettings", JSON.stringify(settings));
 }
 
-document.getElementById("userKeyInput").addEventListener("click", () => {
+answerBox.addEventListener("focus", () => {
   console.log(selectCharacter(sessionScores));
+  answerBox.value = "";
   const thisChar = selectCharacter(sessionScores);
   if (m.getRemaining() > 0) {
     m.stop();
   }
   m.play(thisChar);
   currentChar = thisChar;
+  currentCharAttempts = 0;
+  charStartTime = new Date().getTime();
+  replayInterval = setInterval(() => repeatMorseCode(currentChar), 3000);
 });
 
-let currentChar = "";
+function repeatMorseCode(char) {
+  if (m.getRemaining() > 0) {
+    m.stop();
+  }
+  m.play(char);
+  answerBox.value = answerBox.value += char;
+  currentCharAttempts++;
+}
 
-document.getElementById("userKeyInput").addEventListener("keydown", (event) => {
-  const inputField = document.getElementById("userKeyInput");
-  const cursorPosition = inputField.selectionStart; // Get the current cursor position
+answerBox.addEventListener("blur", () => {
+  clearTimeout(replayInterval);
+});
+
+answerBox.addEventListener("keydown", (event) => {
+  const cursorPosition = answerBox.selectionStart; // Get the current cursor position
   let char = event.key;
   console.log(event);
   char = char.toUpperCase();
 
+  const character = sessionScores.find((c) => c.char === currentChar);
+  character.attempts++;
   // Check if the pressed key is a letter, number, or punctuation
   if (
     char.length === 1 &&
@@ -325,34 +303,44 @@ document.getElementById("userKeyInput").addEventListener("keydown", (event) => {
     console.log(char, currentChar);
 
     if (char == currentChar) {
-      updateCharacterError(currentChar, false);
+      if (currentCharAttempts == 0) {
+        updateCharacterError(currentChar, false);
+      } else {
+        updateCharacterError(currentChar, true);
+      }
+      currentCharAttempts = 0;
+      clearTimeout(replayInterval);
+      const newResponseTime = new Date().getTime() - charStartTime;
+      character.avgResponseTime =
+        (character.avgResponseTime * (character.attempts - 1) +
+          newResponseTime) /
+        character.attempts;
 
       const thisChar = selectCharacter(sessionScores);
       if (m.getRemaining() > 0) {
         m.stop();
+        setTimeout(() => m.play(thisChar), 300);
+      } else {
+        m.play(thisChar);
       }
-      m.play(thisChar);
       currentChar = thisChar;
-      inputField.value = "";
+      replayInterval = setInterval(() => repeatMorseCode(currentChar), 3000);
+      answerBox.value = "";
     } else {
-      updateCharacterError(currentChar, true);
-      // if (m.getRemaining() > 0) {
-      //   m.stop();
-      // }
-      // m.play(currentChar);
-      const currentValue = inputField.value;
-      inputField.value =
+      currentCharAttempts++;
+      character.mistakes++;
+
+      const currentValue = answerBox.value;
+      answerBox.value =
         currentValue.slice(0, cursorPosition) +
         char +
         currentValue.slice(cursorPosition);
 
       // Restore the cursor position
-      inputField.setSelectionRange(cursorPosition + 1, cursorPosition + 1);
+      answerBox.setSelectionRange(cursorPosition + 1, cursorPosition + 1);
     }
 
-    // Prevent the default action of entering the character
     saveAllScores();
-    // Insert the uppercase character at the current cursor position
   } else {
     event.preventDefault();
     return;
@@ -364,23 +352,30 @@ function updateCharacterError(char, isError) {
   const character = sessionScores.find((c) => c.char === char);
 
   if (character) {
-    // If there was an error, decrement the error count
     if (isError) {
       console.log("INCORRECT");
-      character.error = Math.min(255, character.error + 15); // Ensure error count doesn't go below 0
+      character.error = Math.min(255, character.error + 15); // Increment error count
     } else {
       console.log("CORRECT");
-      character.error = Math.max(0, character.error - 20);
+      const decreaseFactor = Math.max(5, character.error / 10); // Decrease less as error decreases
+      character.error = Math.max(
+        0,
+        Math.round(character.error - decreaseFactor)
+      );
     }
 
-    // Unlock next character if the current character's error count reaches a certain threshold
-    if (character.error <= 50) {
-      // Example threshold of error <= 200
+    if (areAllScoresBelowThreshold(100)) {
       unlockNextCharacter(char);
-      // character.error += Math.min(255, character.error + 125);
     }
+
     updateChart();
   }
+}
+
+function areAllScoresBelowThreshold(threshold) {
+  return sessionScores
+    .filter((character) => character.active)
+    .every((character) => character.error < threshold);
 }
 
 function unlockNextCharacter() {
@@ -392,12 +387,10 @@ function unlockNextCharacter() {
     if (!nextCharacter.active) {
       // Unlock the next character
       nextCharacter.active = true; // Set to true to unlock it for the session
-      console.log(`Character ${nextCharacter.char} is now unlocked!`);
-      return; // Exit after unlocking the next available character
+      console.log(`Character ${nextCharacter.char} is now unlocked`);
+      return;
     }
   }
-
-  // If no more characters are available, print a message
   console.log("No more characters to unlock in the session.");
 }
 
