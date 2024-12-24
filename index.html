@@ -9,8 +9,9 @@
       src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"
       integrity="sha512-CQBWl4fJHWbryGE+Pc7UAxWMUMNMWzWxF4SQo9CgkJIN1kx6djDQZjh3Y8SZ1d+6I+1zze6Z7kHXO7q3UyZAWw=="
       crossorigin="anonymous"
-      referrerpolicy="no-referrer"></script>
-    <script src="https://fkurz.net/ham/jscwlib/src/jscwlib.js"></script>
+      referrerpolicy="no-referrer"
+    ></script>
+    <script src="jscwlib.js"></script>
   </head>
   <body>
     <div class="max-w-screen-lg mx-auto px-4 md:px-6 select-none">
@@ -19,7 +20,8 @@
         <!-- Logo -->
         <button
           class="flex items-center space-x-2"
-          onclick="showSection('learn')">
+          onclick="showSection('learn')"
+        >
           <img src="dist/logoPlain.svg" alt="Logo" class="w-40" />
         </button>
 
@@ -29,28 +31,32 @@
             <svg
               xmlns="http://www.w3.org/2000/svg"
               viewBox="0 0 512 512"
-              class="h-5">
+              class="h-5"
+            >
               <!--!Font Awesome Free 6.7.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2024 Fonticons, Inc.-->
               <path
-                d="M495.9 166.6c3.2 8.7 .5 18.4-6.4 24.6l-43.3 39.4c1.1 8.3 1.7 16.8 1.7 25.4s-.6 17.1-1.7 25.4l43.3 39.4c6.9 6.2 9.6 15.9 6.4 24.6c-4.4 11.9-9.7 23.3-15.8 34.3l-4.7 8.1c-6.6 11-14 21.4-22.1 31.2c-5.9 7.2-15.7 9.6-24.5 6.8l-55.7-17.7c-13.4 10.3-28.2 18.9-44 25.4l-12.5 57.1c-2 9.1-9 16.3-18.2 17.8c-13.8 2.3-28 3.5-42.5 3.5s-28.7-1.2-42.5-3.5c-9.2-1.5-16.2-8.7-18.2-17.8l-12.5-57.1c-15.8-6.5-30.6-15.1-44-25.4L83.1 425.9c-8.8 2.8-18.6 .3-24.5-6.8c-8.1-9.8-15.5-20.2-22.1-31.2l-4.7-8.1c-6.1-11-11.4-22.4-15.8-34.3c-3.2-8.7-.5-18.4 6.4-24.6l43.3-39.4C64.6 273.1 64 264.6 64 256s.6-17.1 1.7-25.4L22.4 191.2c-6.9-6.2-9.6-15.9-6.4-24.6c4.4-11.9 9.7-23.3 15.8-34.3l4.7-8.1c6.6-11 14-21.4 22.1-31.2c5.9-7.2 15.7-9.6 24.5-6.8l55.7 17.7c13.4-10.3 28.2-18.9 44-25.4l12.5-57.1c2-9.1 9-16.3 18.2-17.8C227.3 1.2 241.5 0 256 0s28.7 1.2 42.5 3.5c9.2 1.5 16.2 8.7 18.2 17.8l12.5 57.1c15.8 6.5 30.6 15.1 44 25.4l55.7-17.7c8.8-2.8 18.6-.3 24.5 6.8c8.1 9.8 15.5 20.2 22.1 31.2l4.7 8.1c6.1 11 11.4 22.4 15.8 34.3zM256 336a80 80 0 1 0 0-160 80 80 0 1 0 0 160z" />
+                d="M495.9 166.6c3.2 8.7 .5 18.4-6.4 24.6l-43.3 39.4c1.1 8.3 1.7 16.8 1.7 25.4s-.6 17.1-1.7 25.4l43.3 39.4c6.9 6.2 9.6 15.9 6.4 24.6c-4.4 11.9-9.7 23.3-15.8 34.3l-4.7 8.1c-6.6 11-14 21.4-22.1 31.2c-5.9 7.2-15.7 9.6-24.5 6.8l-55.7-17.7c-13.4 10.3-28.2 18.9-44 25.4l-12.5 57.1c-2 9.1-9 16.3-18.2 17.8c-13.8 2.3-28 3.5-42.5 3.5s-28.7-1.2-42.5-3.5c-9.2-1.5-16.2-8.7-18.2-17.8l-12.5-57.1c-15.8-6.5-30.6-15.1-44-25.4L83.1 425.9c-8.8 2.8-18.6 .3-24.5-6.8c-8.1-9.8-15.5-20.2-22.1-31.2l-4.7-8.1c-6.1-11-11.4-22.4-15.8-34.3c-3.2-8.7-.5-18.4 6.4-24.6l43.3-39.4C64.6 273.1 64 264.6 64 256s.6-17.1 1.7-25.4L22.4 191.2c-6.9-6.2-9.6-15.9-6.4-24.6c4.4-11.9 9.7-23.3 15.8-34.3l4.7-8.1c6.6-11 14-21.4 22.1-31.2c5.9-7.2 15.7-9.6 24.5-6.8l55.7 17.7c13.4-10.3 28.2-18.9 44-25.4l12.5-57.1c2-9.1 9-16.3 18.2-17.8C227.3 1.2 241.5 0 256 0s28.7 1.2 42.5 3.5c9.2 1.5 16.2 8.7 18.2 17.8l12.5 57.1c15.8 6.5 30.6 15.1 44 25.4l55.7-17.7c8.8-2.8 18.6-.3 24.5 6.8c8.1 9.8 15.5 20.2 22.1 31.2l4.7 8.1c6.1 11 11.4 22.4 15.8 34.3zM256 336a80 80 0 1 0 0-160 80 80 0 1 0 0 160z"
+              />
             </svg>
           </button>
           <button onclick="showSection('stats')">
             <svg
               xmlns="http://www.w3.org/2000/svg"
               viewBox="0 0 448 512"
-              class="h-5">
+              class="h-5"
+            >
               <!--!Font Awesome Free 6.7.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2024 Fonticons, Inc.-->
               <path
-                d="M224 256A128 128 0 1 0 224 0a128 128 0 1 0 0 256zm-45.7 48C79.8 304 0 383.8 0 482.3C0 498.7 13.3 512 29.7 512l388.6 0c16.4 0 29.7-13.3 29.7-29.7C448 383.8 368.2 304 269.7 304l-91.4 0z" />
+                d="M224 256A128 128 0 1 0 224 0a128 128 0 1 0 0 256zm-45.7 48C79.8 304 0 383.8 0 482.3C0 498.7 13.3 512 29.7 512l388.6 0c16.4 0 29.7-13.3 29.7-29.7C448 383.8 368.2 304 269.7 304l-91.4 0z"
+              />
             </svg>
           </button>
         </div>
       </header>
 
       <div id="learn" class="transition-opacity duration-500 opacity-100">
-        <div>
-          <canvas id="characterChart" class="width-full"></canvas>
+        <div class="h-80">
+          <canvas id="characterChart"></canvas>
         </div>
         <div class="w-full flex justify-center mt-4">
           <input
@@ -58,19 +64,43 @@
             id="answerBox"
             placeholder="Click here"
             autocomplete="off"
-            class="input input-bordered max-w-xs w-full" />
+            class="input input-bordered max-w-xs w-full"
+          />
         </div>
       </div>
-      <div id="stats" class="transition-opacity duration-500 opacity-0 hidden">
-        Your stats
+      <div
+        id="stats"
+        class="transition-opacity duration-500 opacity-0 hidden mb-8"
+      >
+        <h2 class="text-center text-2xl font-bold mb-4">Your Stats</h2>
+        <div class="flex flex-col space-y-6">
+          <div>
+            <h3 class="text-xl font-semibold text-center">
+              Average Response Time
+            </h3>
+            <div class="h-80">
+              <canvas id="responseTimeChart" class="width-full"></canvas>
+            </div>
+          </div>
+          <div>
+            <h3 class="text-xl font-semibold text-center">
+              Mistakes per Character
+            </h3>
+            <div class="h-80">
+              <canvas id="mistakesChart" class="width-full"></canvas>
+            </div>
+          </div>
+        </div>
       </div>
       <div
         id="settings"
-        class="transition-opacity duration-500 opacity-0 hidden">
+        class="transition-opacity duration-500 opacity-0 hidden"
+      >
         <div class="container mx-auto p-8 max-w-4xl flex justify-center">
           <!-- Settings and Hints Section Wrapper -->
           <div
-            class="grid grid-cols-1 lg:grid-cols-2 gap-8 max-w-md lg:max-w-7xl">
+            class="grid grid-cols-1 lg:grid-cols-2 gap-8 max-w-md lg:max-w-7xl"
+          >
             <!-- Settings Section -->
             <div class="bg-white p-6 rounded-lg shadow-lg">
               <div class="space-y-4">
@@ -83,7 +113,8 @@
                         type="checkbox"
                         name="Numbers"
                         id="Numbers"
-                        class="checkbox checkbox-primary" />
+                        class="checkbox checkbox-primary"
+                      />
                     </label>
 
                     <label class="label cursor-pointer">
@@ -92,7 +123,8 @@
                         type="checkbox"
                         name="Symbols"
                         id="Symbols"
-                        class="checkbox checkbox-primary" />
+                        class="checkbox checkbox-primary"
+                      />
                     </label>
                   </div>
                 </div>
@@ -111,7 +143,8 @@
                       min="300"
                       max="1500"
                       value="500"
-                      class="range range-sm range-primary w-full" />
+                      class="range range-sm range-primary w-full"
+                    />
                     <div class="label">
                       <span class="label-text-alt">Low</span>
                       <span class="label-text-alt">High</span>
@@ -130,7 +163,8 @@
                       min="20"
                       max="100"
                       value="25"
-                      class="range range-sm range-primary w-full" />
+                      class="range range-sm range-primary w-full"
+                    />
                     <div class="label">
                       <span class="label-text-alt">Slow</span>
                       <span class="label-text-alt">Fast</span>
@@ -142,7 +176,8 @@
 
             <!-- Hints Section -->
             <div
-              class="bg-blue-100 border border-blue-300 text-blue-800 p-4 rounded-lg shadow-md">
+              class="bg-blue-100 border border-blue-300 text-blue-800 p-4 rounded-lg shadow-md"
+            >
               <h1 class="text-xl font-semibold mb-2">Hints</h1>
               <ul class="list-disc pl-5 space-y-2">
                 <li>
