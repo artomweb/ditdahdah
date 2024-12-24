@@ -479,13 +479,7 @@ const responseTimeChart = new Chart(responseTimeChartCtx, {
     aspectRatio: 1,
     maintainAspectRatio: false,
     scales: {
-      y: {
-        display: false,
-        ticks: {
-          beginAtZero: true,
-          max: 255,
-        },
-      },
+      y: {},
       x: {
         ticks: {
           autoSkip: false,
@@ -548,13 +542,7 @@ const mistakesChart = new Chart(mistakesChartCtx, {
     aspectRatio: 1,
     maintainAspectRatio: false,
     scales: {
-      y: {
-        display: false,
-        ticks: {
-          beginAtZero: true,
-          max: 255,
-        },
-      },
+      y: {},
       x: {
         ticks: {
           autoSkip: false,
