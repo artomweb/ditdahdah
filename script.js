@@ -221,8 +221,6 @@ answerBox.addEventListener("keydown", (event) => {
   console.log(event);
   char = char.toUpperCase();
 
-  event.preventDefault();
-
   const character = allScores.find((c) => c.char === currentChar);
 
   // Check if the pressed key is a letter, number, or punctuation
@@ -244,7 +242,7 @@ answerBox.addEventListener("keydown", (event) => {
       currentCharAttempts = 0;
       clearTimeout(replayInterval);
       const newResponseTime = Math.min(
-        new Date().getTime() - charStartTime,
+        new Date().getTime() - charStartTime - m.getLength() * 1000,
         waitForGuess
       );
 
@@ -252,7 +250,14 @@ answerBox.addEventListener("keydown", (event) => {
         console.error("Response time exceeded waiting time");
       }
 
-      const cappedResponseTime = Math.min(newResponseTime, waitForGuess); // Safety of wait for guess if something is wrong
+      if (newResponseTime < 0) {
+        console.error("New response time");
+      }
+
+      const cappedResponseTime = Math.max(
+        Math.min(newResponseTime, waitForGuess),
+        0
+      ); // Safety of wait for guess if something is wrong
       console.log(cappedResponseTime);
       character.attempts++;
       character.avgResponseTime =
