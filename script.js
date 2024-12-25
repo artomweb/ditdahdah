@@ -12,13 +12,8 @@ let charStartTime = 0;
 let waitForGuess = 3000;
 
 // When the page loads
-document.addEventListener("DOMContentLoaded", function (event) {
-  loadSessionCharacters(); // Load the scores from local storage
-  updateCharsList(); // Update the list of characters used for the graph
-  updateChart(); // Update the chart
-  saveAllScores(); // Save data to local storage
-
-  const urlParams = new URLSearchParams(window.location.hash.slice(1)); // get the url params
+function handleNavigation() {
+  const urlParams = new URLSearchParams(window.location.hash.slice(1)); // Get the URL params
   const stats = urlParams.get("stats");
   const settings = urlParams.get("settings");
 
@@ -30,6 +25,16 @@ document.addEventListener("DOMContentLoaded", function (event) {
   } else {
     showSection("learn");
   }
+}
+
+// Initial setup on page load
+document.addEventListener("DOMContentLoaded", function () {
+  loadSessionCharacters(); // Load the scores from local storage
+  updateCharsList(); // Update the list of characters used for the graph
+  updateChart(); // Update the chart
+  saveAllScores(); // Save data to local storage
+
+  handleNavigation(); // Handle initial navigation logic
 
   // Load user settings from localStorage
   const savedSettings = JSON.parse(localStorage.getItem("userSettings")) || {};
@@ -54,6 +59,9 @@ document.addEventListener("DOMContentLoaded", function (event) {
   m.setFreq(+pitchSlider.value);
   m.setWpm(+speedSlider.value);
 });
+
+// Listen for hash changes to update sections dynamically
+window.addEventListener("hashchange", handleNavigation);
 
 function updateStatsPage() {
   const avgResponseTimes = chartData.map((char) => char.avgResponseTime);
