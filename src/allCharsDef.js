@@ -1,4 +1,4 @@
-const allCharacters = [
+export const allCharacters = [
   {
     char: "Q",
     type: "letter",

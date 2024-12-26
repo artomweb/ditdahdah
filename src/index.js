@@ -1,6 +1,62 @@
-let statsPage = document.getElementById("stats");
-let settingsPage = document.getElementById("settings");
-let learnPage = document.getElementById("learn");
+import { jscw } from "./jscwlib.js";
+import { Chart, LinearScale, CategoryScale } from "chart.js";
+
+import {
+  BarWithErrorBarsController,
+  BarWithErrorBar,
+} from "chartjs-chart-error-bars";
+
+Chart.register(
+  BarWithErrorBarsController,
+  BarWithErrorBar,
+  LinearScale,
+  CategoryScale
+);
+
+const characters = [
+  "Q",
+  "7",
+  "Z",
+  "G",
+  "0",
+  "9",
+  "8",
+  "O",
+  "1",
+  "J",
+  "P",
+  "W",
+  ".",
+  "L",
+  "R",
+  "A",
+  "M",
+  "6",
+  "B",
+  "/",
+  "X",
+  "D",
+  "=",
+  "Y",
+  "C",
+  "K",
+  "N",
+  "2",
+  "3",
+  "?",
+  "F",
+  "U",
+  "4",
+  "5",
+  "V",
+  "H",
+  "S",
+  "I",
+  "T",
+  "E",
+];
+const activeChars = ["Q", "7", "Z", "G"];
+
 let answerBox = document.getElementById("answerBox");
 
 let currentChar = "";
@@ -10,6 +66,22 @@ let replayInterval;
 let currentCharAttempts = 0;
 let charStartTime = 0;
 let waitForGuess = 3000;
+
+document
+  .getElementById("learn-btn")
+  .addEventListener("click", () => showSection("learn"));
+document
+  .getElementById("settings-btn")
+  .addEventListener("click", () => showSection("settings"));
+document
+  .getElementById("stats-btn")
+  .addEventListener("click", () => showSection("stats"));
+document
+  .getElementById("resetChars-btn")
+  .addEventListener("click", () => resetChars());
+document
+  .getElementById("resetScores-btn")
+  .addEventListener("click", () => resetScores());
 
 // When the page loads
 function handleNavigation() {
@@ -37,6 +109,7 @@ document.addEventListener("DOMContentLoaded", () => {
   speedSlider.value = savedSettings.speed || speedSlider.value;
 
   loadSessionCharacters(); // Load saved character scores
+
   updateCharsList(); // Update character list and chart data
   saveAllScores(); // Save initial scores to local storage
   handleNavigation(); // Handle navigation logic based on hash
@@ -104,13 +177,25 @@ function updateStatsPage() {
 }
 
 function saveAllScores() {
+  console.log("save all scores", allScores);
   localStorage.setItem("allScores", JSON.stringify(allScores));
 }
 
-// Load scores from local storage
 function loadSessionCharacters() {
-  const storedScores = JSON.parse(localStorage.getItem("allScores"));
-  allScores = storedScores || allCharacters;
+  allScores = JSON.parse(localStorage.getItem("allScores")) || [];
+
+  if (allScores.length === 0) {
+    allScores = characters.map((char) => ({
+      char,
+      type: isNaN(char) ? "letter" : "number", // Determines type based on whether it's a number or letter
+      error: 255,
+      active: activeChars.includes(char), // Set active to true if the character is in the activeChars array
+      avgResponseTime: 0,
+      mistakes: 0,
+      attempts: 0,
+    }));
+    console.log("all scores init", allScores);
+  }
 }
 
 function updateChart() {
@@ -192,6 +277,7 @@ function resetScores() {
 
     char.avgResponseTime = 0;
     char.mistakes = 0;
+    char.attempts = 0;
   });
   saveAllScores();
   updateCharsList(); // Update character list and chart data
@@ -288,12 +374,12 @@ function handleCorrectAnswer(character) {
   ); // It is possible to guess before the character has finished playing
 
   console.log("responseTime: " + responseTime);
-  character.attempts++;
 
   if (responseTime < 0) {
     console.error("Response time is negative");
   }
   if (currentCharAttempts == 0) {
+    character.attempts++;
     character.avgResponseTime =
       (character.avgResponseTime * (character.attempts - 1) + responseTime) /
       character.attempts;
@@ -501,7 +587,7 @@ const characterChart = new Chart(characterChartCtx, {
 });
 
 const responseTimeChart = new Chart(responseTimeChartCtx, {
-  type: "barWithErrorBars",
+  type: BarWithErrorBarsController.id,
   data: {
     labels: [],
     datasets: [
