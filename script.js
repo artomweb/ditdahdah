@@ -35,7 +35,6 @@ document.addEventListener("DOMContentLoaded", () => {
   Symbols.checked = savedSettings.Symbols || false;
   pitchSlider.value = savedSettings.pitch || pitchSlider.value;
   speedSlider.value = savedSettings.speed || speedSlider.value;
-  dataRangeSelect.value = savedSettings.dataRange || dataRangeSelect.value;
 
   loadSessionCharacters(); // Load saved character scores
   updateCharsList(); // Update character list and chart data
@@ -49,7 +48,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
 // Update stats page visuals
 function updateStatsPage() {
-  console.log(dataRangeSelect.value);
   mistakesChart.data.labels = chartData.map((e) => e.char);
 
   mistakesChart.data.datasets[0].backgroundColor = chartData.map((e) => {
@@ -73,49 +71,31 @@ function updateStatsPage() {
     }
   });
 
-  if (dataRangeSelect.value == "all") {
-    const mistakes = chartData.map((char) => char.mistakes);
-    const avgResponseTimes = chartData.map((char) => char.avgResponseTime);
+  const mistakes = chartData.map((char) => char.mistakes);
 
-    mistakesChart.data.datasets[0].data = mistakes;
-    responseTimeChart.data.datasets[0].data = avgResponseTimes;
-  } else if (dataRangeSelect.value == "last50") {
-    const mistakes = chartData.map(
-      (char) =>
-        char.lastAttempts?.reduce(
-          (sum, a) => sum + (a.mistakes || 0), // Use 0 if mistakes is missing
-          0
-        ) ?? 0 // Default to 0 if `lastAttempts` is undefined or empty
-    );
+  const avgResponseTimes = chartData.map((char) => {
+    const attempts = char.last50ResponseTimes || [];
 
-    const avgResponseTimes = chartData.map((char) => {
-      const attempts =
-        char.lastAttempts?.filter((a) => a.responseTime != null) ?? [];
+    const avgResponseTime = char.avgResponseTime;
 
-      const avgResponseTime = attempts.length
-        ? attempts.reduce((sum, a) => sum + a.responseTime, 0) / attempts.length
-        : 0;
+    // If attempts array is empty, set min and max to zero
+    const minResponseTime = attempts.length > 0 ? Math.min(...attempts) : 0;
+    const maxResponseTime = attempts.length > 0 ? Math.max(...attempts) : 0;
 
-      // If the average response time is zero, set min and max to zero as well
-      const minResponseTime = Math.min(...attempts.map((a) => a.responseTime));
-      const maxResponseTime = Math.max(...attempts.map((a) => a.responseTime));
+    const yMin = avgResponseTime === 0 ? 0 : minResponseTime;
+    const yMax = avgResponseTime === 0 ? 0 : maxResponseTime;
 
-      const yMin = avgResponseTime === 0 ? 0 : minResponseTime;
-      const yMax = avgResponseTime === 0 ? 0 : maxResponseTime;
+    // Create the dataset in the format with y, yMin, and yMax
+    return {
+      y: avgResponseTime, // Use the average response time for `y`
+      yMin, // Set the minimum response time (or zero if avg is zero)
+      yMax, // Set the maximum response time (or zero if avg is zero)
+    };
+  });
 
-      // Create the dataset in the format with y, yMin, and yMax
-      return {
-        y: avgResponseTime, // Use the average response time for `y`
-        yMin, // Set the minimum response time (or zero if avg is zero)
-        yMax, // Set the maximum response time (or zero if avg is zero)
-      };
-    });
+  mistakesChart.data.datasets[0].data = mistakes;
+  responseTimeChart.data.datasets[0].data = avgResponseTimes;
 
-    mistakesChart.data.datasets[0].data = mistakes;
-    responseTimeChart.data.datasets[0].data = avgResponseTimes;
-
-    console.log(mistakes, avgResponseTimes);
-  }
   mistakesChart.update();
   responseTimeChart.update();
 }
@@ -163,21 +143,18 @@ const Numbers = document.getElementById("Numbers");
 const Symbols = document.getElementById("Symbols");
 const speedSlider = document.getElementById("speed");
 const pitchSlider = document.getElementById("pitch");
-const dataRangeSelect = document.getElementById("dataRangeSelect");
 
 // Setup input listeners
-[Numbers, Symbols, pitchSlider, speedSlider, dataRangeSelect].forEach(
-  (input) => {
-    if (input.type === "checkbox") {
-      input.addEventListener("change", updateCharsList);
-    } else if (input.type === "range") {
-      input.addEventListener("input", handleSliderInput);
-      input.addEventListener("mousedown", handleSliderInput);
-    } else if (input.type === "select-one") {
-      input.addEventListener("change", selectOneChange);
-    }
+[Numbers, Symbols, pitchSlider, speedSlider].forEach((input) => {
+  if (input.type === "checkbox") {
+    input.addEventListener("change", updateCharsList);
+  } else if (input.type === "range") {
+    input.addEventListener("input", handleSliderInput);
+    input.addEventListener("mousedown", handleSliderInput);
+  } else if (input.type === "select-one") {
+    input.addEventListener("change", selectOneChange);
   }
-);
+});
 
 function selectOneChange() {
   updateStatsPage();
@@ -207,7 +184,8 @@ function resetScores() {
   // Loop through each character in chartData and reset their scores
   allScores.forEach((char) => {
     // Clear the lastAttempts array
-    char.lastAttempts = [];
+    char.last50Mistakes = [];
+    char.last50ResponseTimes = [];
 
     char.avgResponseTime = 0;
     char.mistakes = 0;
@@ -250,7 +228,6 @@ function updateLocalStorage() {
     Symbols: Symbols.checked,
     pitch: pitchSlider.value,
     speed: speedSlider.value,
-    dataRange: dataRangeSelect.value,
   };
   localStorage.setItem("userSettings", JSON.stringify(settings));
 }
@@ -307,6 +284,9 @@ function handleCorrectAnswer(character) {
     100
   ); // It is possible to guess before the character has finished playing
 
+  console.log("responseTime: " + responseTime);
+  character.attempts++;
+
   if (responseTime < 0) {
     console.error("Response time is negative");
   }
@@ -314,9 +294,9 @@ function handleCorrectAnswer(character) {
     character.avgResponseTime =
       (character.avgResponseTime * (character.attempts - 1) + responseTime) /
       character.attempts;
+    console.log("is first attempt: " + character.avgResponseTime);
     updateLastAttempts(character, { responseTime });
   }
-  character.attempts++;
 
   updateCharacterError(currentChar, currentCharAttempts > 0);
   clearInterval(replayInterval);
@@ -337,16 +317,29 @@ function handleCorrectAnswer(character) {
 }
 
 function updateLastAttempts(character, attempt) {
-  if (!character.lastAttempts) {
-    character.lastAttempts = [];
+  if (!character.last50ResponseTimes) {
+    character.last50ResponseTimes = [];
+  }
+
+  if (!character.last50Mistakes) {
+    character.last50Mistakes = [];
+  }
+
+  if (attempt.responseTime) {
+    character.last50ResponseTimes.push(attempt.responseTime);
+  } else if (attempt.mistakes) {
+    character.last50Mistakes.push(attempt.mistakes);
   }
 
   // Add the new attempt to the lastAttempts array
-  character.lastAttempts.push(attempt);
 
   // Keep only the last 50 attempts
-  if (character.lastAttempts.length > 50) {
-    character.lastAttempts.shift();
+  if (character.last50ResponseTimes.length > 50) {
+    character.last50ResponseTimes.shift();
+  }
+
+  if (character.last50Mistakes.length > 50) {
+    character.last50Mistakes.shift();
   }
 }
 
@@ -535,6 +528,7 @@ const responseTimeChart = new Chart(responseTimeChartCtx, {
         display: false,
       },
       tooltip: {
+        // intersect: false,
         enabled: true,
         callbacks: {
           title: function (tooltipItems) {
@@ -546,6 +540,7 @@ const responseTimeChart = new Chart(responseTimeChartCtx, {
             return `${character}: ${spacedMorseCode}`;
           },
           label: function (tooltipItem) {
+            console.log(tooltipItem.raw.y);
             // Optionally, add more information to the tooltip label if needed
             return `Value: ${Math.round(tooltipItem.raw.y)} ms`;
           },
@@ -556,10 +551,12 @@ const responseTimeChart = new Chart(responseTimeChartCtx, {
     onHover: function (e) {
       const points = this.getElementsAtEventForMode(
         e,
-        "index",
-        { axis: "x", intersect: true },
-        false
+        "nearest",
+        { intersect: true },
+        true
       );
+
+      // console.log(points);
 
       if (points.length) e.native.target.style.cursor = "pointer";
       else e.native.target.style.cursor = "default";
@@ -586,7 +583,15 @@ const mistakesChart = new Chart(mistakesChartCtx, {
     aspectRatio: 1,
     maintainAspectRatio: false,
     scales: {
-      y: {},
+      y: {
+        ticks: {
+          callback: function (value) {
+            if (value % 1 === 0) {
+              return value;
+            }
+          },
+        },
+      },
       x: {
         ticks: {
           autoSkip: false,
