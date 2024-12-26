@@ -1,5 +1,5 @@
 import { jscw } from "./jscwlib.js";
-import { Chart, LinearScale, CategoryScale } from "chart.js";
+import { Chart, LinearScale, CategoryScale, Tooltip } from "chart.js";
 
 import {
   BarWithErrorBarsController,
@@ -7,6 +7,7 @@ import {
 } from "chartjs-chart-error-bars";
 
 Chart.register(
+  Tooltip,
   BarWithErrorBarsController,
   BarWithErrorBar,
   LinearScale,
