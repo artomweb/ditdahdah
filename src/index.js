@@ -713,10 +713,12 @@ const mistakesChart = new Chart(mistakesChartCtx, {
     onHover: function (e) {
       const points = this.getElementsAtEventForMode(
         e,
-        "index",
-        { axis: "x", intersect: true },
-        false
+        "nearest",
+        { intersect: true },
+        true
       );
+
+      // console.log(points);
 
       if (points.length) e.native.target.style.cursor = "pointer";
       else e.native.target.style.cursor = "default";
