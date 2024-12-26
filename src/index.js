@@ -83,6 +83,8 @@ document
   .getElementById("resetScores-btn")
   .addEventListener("click", () => resetScores());
 
+window.addEventListener("hashchange", handleNavigation);
+
 // When the page loads
 function handleNavigation() {
   const urlParams = new URLSearchParams(window.location.hash.slice(1)); // Get the URL params
