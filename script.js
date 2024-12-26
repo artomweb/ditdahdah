@@ -79,18 +79,21 @@ function updateStatsPage() {
     const avgResponseTime = char.avgResponseTime;
 
     // If attempts array is empty, set min and max to zero
-    const minResponseTime = attempts.length > 0 ? Math.min(...attempts) : 0;
-    const maxResponseTime = attempts.length > 0 ? Math.max(...attempts) : 0;
+    const yMin = attempts.length > 0 ? Math.min(...attempts) : 0;
+    const yMax = attempts.length > 0 ? Math.max(...attempts) : 0;
 
-    const yMin = avgResponseTime === 0 ? 0 : minResponseTime;
-    const yMax = avgResponseTime === 0 ? 0 : maxResponseTime;
-
-    // Create the dataset in the format with y, yMin, and yMax
-    return {
-      y: avgResponseTime, // Use the average response time for `y`
-      yMin, // Set the minimum response time (or zero if avg is zero)
-      yMax, // Set the maximum response time (or zero if avg is zero)
-    };
+    if (avgResponseTime) {
+      // Create the dataset in the format with y, yMin, and yMax
+      return {
+        y: avgResponseTime, // Use the average response time for `y`
+        yMin, // Set the minimum response time (or zero if avg is zero)
+        yMax, // Set the maximum response time (or zero if avg is zero)
+      };
+    } else {
+      return {
+        y: avgResponseTime, // Use the average response time for `y`
+      };
+    }
   });
 
   mistakesChart.data.datasets[0].data = mistakes;
