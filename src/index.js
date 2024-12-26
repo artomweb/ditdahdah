@@ -189,13 +189,18 @@ function loadSessionCharacters() {
   if (allScores.length === 0) {
     allScores = characters.map((char) => ({
       char,
-      type: isNaN(char) ? "letter" : "number", // Determines type based on whether it's a number or letter
+      type: isNaN(char)
+        ? /[a-zA-Z]/.test(char)
+          ? "letter"
+          : "symbol" // Checks if it's a letter or symbol
+        : "number", // Determines type based on whether it's a number
       error: 255,
       active: activeChars.includes(char), // Set active to true if the character is in the activeChars array
       avgResponseTime: 0,
       mistakes: 0,
       attempts: 0,
     }));
+
     console.log("all scores init", allScores);
   }
 }
