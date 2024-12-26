@@ -11,10 +11,12 @@
       crossorigin="anonymous"
       referrerpolicy="no-referrer"
     ></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-chart-error-bars@4.4.4/build/index.umd.min.js"></script>
     <script src="jscwlib.js"></script>
   </head>
   <body>
     <div class="max-w-screen-lg mx-auto px-4 md:px-6 select-none">
+      <div class="toast toast-top toast-end" id="toast-container"></div>
       <!-- Header -->
       <header class="flex justify-between items-center p-4">
         <!-- Logo -->
@@ -54,7 +56,10 @@
         </div>
       </header>
 
-      <div id="learn" class="transition-opacity duration-500 opacity-100">
+      <div
+        id="learn"
+        class="transition-opacity duration-500 opacity-100 section"
+      >
         <div class="h-80">
           <canvas id="characterChart"></canvas>
         </div>
@@ -70,9 +75,18 @@
       </div>
       <div
         id="stats"
-        class="transition-opacity duration-500 opacity-0 hidden mb-8"
+        class="transition-opacity duration-500 opacity-0 hidden mb-8 section"
       >
         <h2 class="text-center text-2xl font-bold mb-4">Your Stats</h2>
+        <div class="flex justify-end mb-4">
+          <select
+            class="select select-bordered select-sm max-w-xs"
+            id="dataRangeSelect"
+          >
+            <option selected value="all">All data</option>
+            <option value="last50">Last 50 attempts</option>
+          </select>
+        </div>
         <div class="flex flex-col space-y-6">
           <div>
             <h3 class="text-xl font-semibold text-center">
@@ -92,9 +106,10 @@
           </div>
         </div>
       </div>
+
       <div
         id="settings"
-        class="transition-opacity duration-500 opacity-0 hidden"
+        class="transition-opacity duration-500 opacity-0 hidden section"
       >
         <div class="container mx-auto p-8 max-w-4xl flex justify-center">
           <!-- Settings and Hints Section Wrapper -->
@@ -172,30 +187,67 @@
                   </div>
                 </div>
               </div>
+              <hr class="mt-2" />
+              <div class="flex justify-center gap-6 mt-4">
+                <button
+                  class="btn btn-outline btn-warning"
+                  onclick="resetChars()"
+                >
+                  Reset Characters
+                </button>
+                <button
+                  class="btn btn-outline btn-error"
+                  onclick="scoreReset.showModal()"
+                >
+                  Reset Scores
+                </button>
+                <dialog id="scoreReset" class="modal">
+                  <div class="modal-box">
+                    <h3 class="text-lg font-bold">RESET!</h3>
+                    <p class="py-4">
+                      This wil reset all of your scores. Are you sure?
+                    </p>
+                    <div class="modal-action">
+                      <form method="dialog">
+                        <!-- if there is a button in form, it will close the modal -->
+                        <button
+                          class="btn btn-outline btn-error"
+                          onclick="resetScores()"
+                        >
+                          Yes, reset
+                        </button>
+                        <button class="btn">Close</button>
+                      </form>
+                    </div>
+                  </div>
+                </dialog>
+              </div>
             </div>
 
             <!-- Hints Section -->
-            <div
-              class="bg-blue-100 border border-blue-300 text-blue-800 p-4 rounded-lg shadow-md"
-            >
-              <h1 class="text-xl font-semibold mb-2">Hints</h1>
-              <ul class="list-disc pl-5 space-y-2">
-                <li>
-                  You can
-                  <span class="font-bold">click on the graph</span>
-                  to hear the characters.
-                </li>
-                <li>
-                  Use the checkboxes to include or exclude
-                  <span class="font-bold">numbers</span>
-                  and
-                  <span class="font-bold mr-0">symbols.</span>
-                </li>
-                <li>
-                  Click away from the input to take a
-                  <span class="font-bold mr-0">break.</span>
-                </li>
-              </ul>
+            <div>
+              <div
+                class="bg-blue-100 border border-blue-300 text-blue-800 p-4 rounded-lg shadow-md"
+              >
+                <h1 class="text-xl font-semibold mb-2">Hints</h1>
+                <ul class="list-disc pl-5 space-y-2">
+                  <li>
+                    You can
+                    <span class="font-bold">click on the graph</span>
+                    to hear the characters.
+                  </li>
+                  <li>
+                    Use the checkboxes to include or exclude
+                    <span class="font-bold">numbers</span>
+                    and
+                    <span class="font-bold mr-0">symbols.</span>
+                  </li>
+                  <li>
+                    Click away from the input to take a
+                    <span class="font-bold mr-0">break.</span>
+                  </li>
+                </ul>
+              </div>
             </div>
           </div>
         </div>

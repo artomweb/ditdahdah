@@ -27,64 +27,96 @@ function handleNavigation() {
   }
 }
 
-// Initial setup on page load
-document.addEventListener("DOMContentLoaded", function () {
-  loadSessionCharacters(); // Load the scores from local storage
-  updateCharsList(); // Update the list of characters used for the graph
-  updateChart(); // Update the chart
-  saveAllScores(); // Save data to local storage
-
-  handleNavigation(); // Handle initial navigation logic
-
-  // Load user settings from localStorage
+document.addEventListener("DOMContentLoaded", () => {
+  // Load user settings from local storage
   const savedSettings = JSON.parse(localStorage.getItem("userSettings")) || {};
+  console.log(savedSettings);
+  Numbers.checked = savedSettings.Numbers || false;
+  Symbols.checked = savedSettings.Symbols || false;
+  pitchSlider.value = savedSettings.pitch || pitchSlider.value;
+  speedSlider.value = savedSettings.speed || speedSlider.value;
+  dataRangeSelect.value = savedSettings.dataRange || dataRangeSelect.value;
 
-  // Set checkbox states based on saved values
-  if (savedSettings.Numbers !== undefined) {
-    Numbers.checked = savedSettings.Numbers;
-  }
-  if (savedSettings.Symbols !== undefined) {
-    Symbols.checked = savedSettings.Symbols;
-  }
+  loadSessionCharacters(); // Load saved character scores
+  updateCharsList(); // Update character list and chart data
+  saveAllScores(); // Save initial scores to local storage
+  handleNavigation(); // Handle navigation logic based on hash
 
-  // Set slider values based on saved values
-  if (savedSettings.pitch !== undefined) {
-    pitchSlider.value = savedSettings.pitch;
-  }
-  if (savedSettings.speed !== undefined) {
-    speedSlider.value = savedSettings.speed;
-  }
-
-  // Set pitch and speed values based on saved values
+  // Apply saved settings to Morse code object
   m.setFreq(+pitchSlider.value);
   m.setWpm(+speedSlider.value);
 });
 
-// Listen for hash changes to update sections dynamically
-window.addEventListener("hashchange", handleNavigation);
-
+// Update stats page visuals
 function updateStatsPage() {
-  const avgResponseTimes = chartData.map((char) => char.avgResponseTime);
-  const mistakes = chartData.map((char) => char.mistakes);
-
-  console.log(mistakes, avgResponseTimes);
-
-  console.log("HELLO");
-
+  console.log(dataRangeSelect.value);
   mistakesChart.data.labels = chartData.map((e) => e.char);
-  mistakesChart.data.datasets[0].data = chartData.map((e) => e.mistakes);
-  mistakesChart.data.datasets[0].backgroundColor = chartData.map((e) =>
-    e.active ? "LightSkyBlue" : "WhiteSmoke"
-  );
-  mistakesChart.update();
+
+  mistakesChart.data.datasets[0].backgroundColor = chartData.map((e) => {
+    if (e.mistakes > 0 && !e.active) {
+      return "PowderBlue"; // Set to LightCyan if mistakes > 0 but not active
+    } else if (e.active) {
+      return "LightSkyBlue"; // Active characters
+    } else {
+      return "WhiteSmoke"; // Default for inactive characters with no mistakes
+    }
+  });
 
   responseTimeChart.data.labels = chartData.map((e) => e.char);
-  responseTimeChart.data.datasets[0].data = chartData.map(
-    (e) => e.avgResponseTime
-  );
-  responseTimeChart.data.datasets[0].backgroundColor = chartData.map((e) =>
-    e.active ? "LightSkyBlue" : "WhiteSmoke"
-  );
+  responseTimeChart.data.datasets[0].backgroundColor = chartData.map((e) => {
+    if (!e.active && e.avgResponseTime > 0) {
+      return "PowderBlue"; // Set to LightCyan if avgResponseTime > 0
+    } else if (e.active) {
+      return "LightSkyBlue"; // Active characters
+    } else {
+      return "WhiteSmoke"; // Default for inactive characters
+    }
+  });
+
+  if (dataRangeSelect.value == "all") {
+    const mistakes = chartData.map((char) => char.mistakes);
+    const avgResponseTimes = chartData.map((char) => char.avgResponseTime);
+
+    mistakesChart.data.datasets[0].data = mistakes;
+    responseTimeChart.data.datasets[0].data = avgResponseTimes;
+  } else if (dataRangeSelect.value == "last50") {
+    const mistakes = chartData.map(
+      (char) =>
+        char.lastAttempts?.reduce(
+          (sum, a) => sum + (a.mistakes || 0), // Use 0 if mistakes is missing
+          0
+        ) ?? 0 // Default to 0 if `lastAttempts` is undefined or empty
+    );
+
+    const avgResponseTimes = chartData.map((char) => {
+      const attempts =
+        char.lastAttempts?.filter((a) => a.responseTime != null) ?? [];
+
+      const avgResponseTime = attempts.length
+        ? attempts.reduce((sum, a) => sum + a.responseTime, 0) / attempts.length
+        : 0;
+
+      // If the average response time is zero, set min and max to zero as well
+      const minResponseTime = Math.min(...attempts.map((a) => a.responseTime));
+      const maxResponseTime = Math.max(...attempts.map((a) => a.responseTime));
+
+      const yMin = avgResponseTime === 0 ? 0 : minResponseTime;
+      const yMax = avgResponseTime === 0 ? 0 : maxResponseTime;
+
+      // Create the dataset in the format with y, yMin, and yMax
+      return {
+        y: avgResponseTime, // Use the average response time for `y`
+        yMin, // Set the minimum response time (or zero if avg is zero)
+        yMax, // Set the maximum response time (or zero if avg is zero)
+      };
+    });
+
+    mistakesChart.data.datasets[0].data = mistakes;
+    responseTimeChart.data.datasets[0].data = avgResponseTimes;
+
+    console.log(mistakes, avgResponseTimes);
+  }
+  mistakesChart.update();
   responseTimeChart.update();
 }
 
@@ -92,17 +124,10 @@ function saveAllScores() {
   localStorage.setItem("allScores", JSON.stringify(allScores));
 }
 
-// Load the scores from local storage
+// Load scores from local storage
 function loadSessionCharacters() {
-  const allScoresStore = JSON.parse(localStorage.getItem("allScores"));
-  if (allScoresStore) {
-    console.log("has allScores");
-    allScores = allScoresStore;
-  } else {
-    console.log("no allScores");
-    // Default to initial characters if nothing is saved
-    allScores = allCharacters;
-  }
+  const storedScores = JSON.parse(localStorage.getItem("allScores"));
+  allScores = storedScores || allCharacters;
 }
 
 function updateChart() {
@@ -119,7 +144,8 @@ function showSection(sectionId) {
     updateStatsPage();
   }
   window.location.hash = "#" + sectionId;
-  const sections = document.querySelectorAll("div[id]");
+  const sections = document.querySelectorAll(".section");
+
   sections.forEach((section) => {
     section.classList.add("opacity-0", "hidden"); // Hide all sections
     section.classList.remove("opacity-100"); // Ensure it's fully hidden
@@ -133,40 +159,75 @@ function showSection(sectionId) {
 
 let m = new jscw({ wpm: 25 });
 
-const inputs = document.querySelectorAll("input");
 const Numbers = document.getElementById("Numbers");
 const Symbols = document.getElementById("Symbols");
 const speedSlider = document.getElementById("speed");
 const pitchSlider = document.getElementById("pitch");
+const dataRangeSelect = document.getElementById("dataRangeSelect");
 
-inputs.forEach((input) => {
-  if (input.type === "checkbox") {
-    input.addEventListener("change", updateCharsList); // Only needs to update on checkbox change
-  } else if (input.type === "range") {
-    input.addEventListener("input", handleSliderInput);
-
-    // Handle click on slider
-    input.addEventListener("mousedown", handleSliderInput);
+// Setup input listeners
+[Numbers, Symbols, pitchSlider, speedSlider, dataRangeSelect].forEach(
+  (input) => {
+    if (input.type === "checkbox") {
+      input.addEventListener("change", updateCharsList);
+    } else if (input.type === "range") {
+      input.addEventListener("input", handleSliderInput);
+      input.addEventListener("mousedown", handleSliderInput);
+    } else if (input.type === "select-one") {
+      input.addEventListener("change", selectOneChange);
+    }
   }
-});
+);
 
+function selectOneChange() {
+  updateStatsPage();
+  updateLocalStorage();
+}
+
+function resetChars() {
+  console.log("resetChars");
+  allScores.forEach((char) => {
+    char.error = 255;
+    if (["Q", "7", "Z", "G"].includes(char.char)) {
+      char.active = true;
+    } else {
+      char.active = false;
+    }
+  });
+
+  console.log(allScores);
+
+  saveAllScores();
+  updateCharsList(); // Update character list and chart data
+
+  showToast("Characters Reset!");
+}
+
+function resetScores() {
+  // Loop through each character in chartData and reset their scores
+  allScores.forEach((char) => {
+    // Clear the lastAttempts array
+    char.lastAttempts = [];
+
+    char.avgResponseTime = 0;
+    char.mistakes = 0;
+  });
+  saveAllScores();
+  updateCharsList(); // Update character list and chart data
+  showToast("Scores Reset!");
+}
+
+// Handle slider input changes
 function handleSliderInput(event) {
-  const target = event.target;
-  if (target.name === "pitch") {
-    if (m.getRemaining() > 0) {
-      m.stop();
-    }
-    m.setFreq(+pitchSlider.value);
-    m.play(" o");
-  } else if (target.name === "speed") {
-    // Add any speed-related logic here
-    console.log(`Speed updated to: ${speedSlider.value}`);
-    if (m.getRemaining() > 0) {
-      m.stop();
-    }
-    m.setWpm(+speedSlider.value);
-    m.play(" o");
+  const { name, value } = event.target;
+  if (m.getRemaining() > 0) m.stop();
+
+  if (name === "pitch") {
+    m.setFreq(+value);
+  } else if (name === "speed") {
+    m.setWpm(+value);
   }
+  m.play(" o");
   updateLocalStorage();
 }
 
@@ -189,21 +250,20 @@ function updateLocalStorage() {
     Symbols: Symbols.checked,
     pitch: pitchSlider.value,
     speed: speedSlider.value,
+    dataRange: dataRangeSelect.value,
   };
   localStorage.setItem("userSettings", JSON.stringify(settings));
 }
 
+// Handle focus on answer box
 answerBox.addEventListener("focus", () => {
   answerBox.value = "";
-  const thisChar = selectCharacter(chartData);
-  console.log(thisChar);
-  if (m.getRemaining() > 0) {
-    m.stop();
-  }
-  m.play(thisChar);
-  currentChar = thisChar;
+  currentChar = selectCharacter(chartData);
+  console.log(currentChar);
+  if (m.getRemaining() > 0) m.stop();
+  m.play(currentChar);
+  charStartTime = Date.now();
   currentCharAttempts = 0;
-  charStartTime = new Date().getTime();
   replayInterval = setInterval(
     () => repeatMorseCode(currentChar),
     waitForGuess
@@ -211,9 +271,7 @@ answerBox.addEventListener("focus", () => {
 });
 
 function repeatMorseCode(char) {
-  if (m.getRemaining() > 0) {
-    m.stop();
-  }
+  if (m.getRemaining() > 0) m.stop();
   m.play(char);
   charStartTime = new Date().getTime();
   answerBox.value = answerBox.value += char;
@@ -221,134 +279,107 @@ function repeatMorseCode(char) {
 }
 
 answerBox.addEventListener("blur", () => {
+  if (m.getRemaining() > 0) m.stop();
   clearTimeout(replayInterval);
 });
 
+// Handle key presses in the answer box
 answerBox.addEventListener("keydown", (event) => {
-  let char = event.key;
-  console.log(event);
-  char = char.toUpperCase();
+  const char = event.key.toUpperCase();
+  event.preventDefault();
+  if (!allScores.some((c) => c.char === char)) return;
 
   const character = allScores.find((c) => c.char === currentChar);
-
-  // Check if the pressed key is a letter, number, or punctuation
-  if (
-    char.length === 1 &&
-    allCharacters.map((character) => character.char).includes(char)
-  ) {
-    // If it's a letter or a number or punctuation, convert it to uppercase
-    event.preventDefault();
-
-    console.log(char, currentChar);
-
-    if (char == currentChar) {
-      if (currentCharAttempts == 0) {
-        updateCharacterError(currentChar, false);
-      } else {
-        updateCharacterError(currentChar, true);
-      }
-      currentCharAttempts = 0;
-      clearTimeout(replayInterval);
-      const newResponseTime = Math.min(
-        new Date().getTime() - charStartTime - m.getLength() * 1000,
-        waitForGuess
-      );
-
-      if (newResponseTime > waitForGuess) {
-        console.error("Response time exceeded waiting time");
-      }
-
-      if (newResponseTime < 0) {
-        console.error("New response time");
-      }
-
-      const cappedResponseTime = Math.max(
-        Math.min(newResponseTime, waitForGuess),
-        0
-      ); // Safety of wait for guess if something is wrong
-      console.log(cappedResponseTime);
-      character.attempts++;
-      character.avgResponseTime =
-        (character.avgResponseTime * (character.attempts - 1) +
-          cappedResponseTime) /
-        character.attempts;
-
-      const thisChar = selectCharacter(chartData);
-      if (m.getRemaining() > 0) {
-        m.stop();
-        setTimeout(() => {
-          m.play(thisChar);
-          charStartTime = new Date().getTime();
-        }, 300);
-      } else {
-        m.play(thisChar);
-        charStartTime = new Date().getTime();
-      }
-      currentChar = thisChar;
-      replayInterval = setInterval(
-        () => repeatMorseCode(currentChar),
-        waitForGuess
-      );
-      answerBox.value = "";
-    } else {
-      currentCharAttempts++;
-      character.mistakes++;
-
-      // answerBox.value += char;
-    }
-
-    saveAllScores();
+  if (char === currentChar) {
+    handleCorrectAnswer(character);
   } else {
-    event.preventDefault();
-    return;
+    character.mistakes++;
+    currentCharAttempts++;
+    updateLastAttempts(character, { mistakes: 1 });
   }
+  saveAllScores();
 });
 
-function updateCharacterError(char, isError) {
-  // Find the character object by its char value
-  const character = allScores.find((c) => c.char === char);
+// Handle correct answer logic
+function handleCorrectAnswer(character) {
+  const responseTime = Math.max(
+    Math.min(Date.now() - charStartTime - m.getLength() * 1000, waitForGuess),
+    100
+  ); // It is possible to guess before the character has finished playing
 
-  if (character) {
-    if (isError) {
-      console.log("INCORRECT");
-      character.error = Math.min(255, character.error + 15); // Increment error count
-    } else {
-      console.log("CORRECT");
-      const decreaseFactor = Math.max(5, character.error / 10); // Decrease less as error decreases
-      character.error = Math.max(
-        0,
-        Math.round(character.error - decreaseFactor)
-      );
-    }
+  if (responseTime < 0) {
+    console.error("Response time is negative");
+  }
+  if (currentCharAttempts == 0) {
+    character.avgResponseTime =
+      (character.avgResponseTime * (character.attempts - 1) + responseTime) /
+      character.attempts;
+    updateLastAttempts(character, { responseTime });
+  }
+  character.attempts++;
 
-    if (areAllScoresBelowThreshold(100)) {
-      unlockNextCharacter(char);
-    }
+  updateCharacterError(currentChar, currentCharAttempts > 0);
+  clearInterval(replayInterval);
 
-    updateChart();
+  saveAllScores();
+
+  currentChar = selectCharacter(chartData);
+
+  m.stop();
+  setTimeout(() => m.play(currentChar), 300);
+  charStartTime = Date.now();
+  replayInterval = setInterval(
+    () => repeatMorseCode(currentChar),
+    waitForGuess
+  );
+  answerBox.value = "";
+  console.log("cleared answer box");
+}
+
+function updateLastAttempts(character, attempt) {
+  if (!character.lastAttempts) {
+    character.lastAttempts = [];
+  }
+
+  // Add the new attempt to the lastAttempts array
+  character.lastAttempts.push(attempt);
+
+  // Keep only the last 50 attempts
+  if (character.lastAttempts.length > 50) {
+    character.lastAttempts.shift();
   }
 }
 
+// Update character error rate
+function updateCharacterError(char, isError) {
+  console.log("character error", char, isError);
+  const character = allScores.find((c) => c.char === char);
+  if (!character) return;
+
+  character.error = isError
+    ? Math.min(255, character.error + 15)
+    : Math.max(
+        0,
+        Math.round(character.error - Math.max(5, character.error / 10))
+      );
+
+  if (areAllScoresBelowThreshold(100)) unlockNextCharacter();
+  updateChart();
+
+  currentCharAttempts = 0;
+}
+
+// Check if all active characters have low error scores
 function areAllScoresBelowThreshold(threshold) {
-  return chartData
-    .filter((character) => character.active)
-    .every((character) => character.error < threshold);
+  return chartData.every((char) => !char.active || char.error < threshold);
 }
 
 function unlockNextCharacter() {
-  // Loop to find the next character that isn't in the session
-  for (let i = 0; i < chartData.length; i++) {
-    const nextCharacter = chartData[i];
-
-    // Check if the character isn't in the session
-    if (!nextCharacter.active) {
-      // Unlock the next character
-      nextCharacter.active = true; // Set to true to unlock it for the session
-      console.log(`Character ${nextCharacter.char} is now unlocked`);
-      return;
-    }
+  const nextChar = chartData.find((c) => !c.active);
+  if (nextChar) {
+    nextChar.active = true;
+    updateChart();
   }
-  console.log("No more characters to unlock in the session.");
 }
 
 function selectCharacter(letters) {
@@ -374,7 +405,7 @@ function selectCharacter(letters) {
     }
   }
 
-  return null; // In case no letter is selected (should not happen if data is valid)
+  return null; // In case no letter is selected
 }
 
 const characterChartCtx = document.getElementById("characterChart");
@@ -474,7 +505,7 @@ const characterChart = new Chart(characterChartCtx, {
 });
 
 const responseTimeChart = new Chart(responseTimeChartCtx, {
-  type: "bar",
+  type: "barWithErrorBars",
   data: {
     labels: [],
     datasets: [
@@ -516,7 +547,7 @@ const responseTimeChart = new Chart(responseTimeChartCtx, {
           },
           label: function (tooltipItem) {
             // Optionally, add more information to the tooltip label if needed
-            return `Value: ${Math.round(tooltipItem.raw)} ms`;
+            return `Value: ${Math.round(tooltipItem.raw.y)} ms`;
           },
         },
       },
@@ -598,3 +629,55 @@ const mistakesChart = new Chart(mistakesChartCtx, {
     },
   },
 });
+function showToast(message) {
+  // Create the alert element
+  const alertDiv = document.createElement("div");
+  alertDiv.setAttribute("role", "alert");
+  alertDiv.classList.add(
+    "alert",
+    // "alert-success",
+    "transition-opacity",
+    "opacity-100",
+    "duration-500"
+  );
+
+  // Create the SVG element
+  const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+  svg.setAttribute("xmlns", "http://www.w3.org/2000/svg");
+  svg.setAttribute("class", "h-6 w-6 shrink-0 stroke-current");
+  svg.setAttribute("fill", "none");
+  svg.setAttribute("viewBox", "0 0 24 24");
+
+  // Create the path element inside the SVG
+  const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
+  path.setAttribute("stroke-linecap", "round");
+  path.setAttribute("stroke-linejoin", "round");
+  path.setAttribute("stroke-width", "2");
+  path.setAttribute("d", "M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z");
+
+  // Append the path to the SVG
+  svg.appendChild(path);
+
+  // Create the span element and set the custom text
+  const span = document.createElement("span");
+  span.textContent = message;
+
+  // Append the SVG and span to the alert div
+  alertDiv.appendChild(svg);
+  alertDiv.appendChild(span);
+
+  // Add alert to the container
+  const container = document.getElementById("toast-container");
+  container.appendChild(alertDiv);
+
+  // Set timeout to fade out the alert after 3 seconds
+  setTimeout(() => {
+    alertDiv.classList.remove("opacity-100");
+    alertDiv.classList.add("opacity-0");
+  }, 3000);
+
+  // Remove the alert from the DOM after the fade-out transition is complete (500ms after opacity is 0)
+  setTimeout(() => {
+    alertDiv.remove();
+  }, 3500); // Match the fade-out timing, 3000ms + 500ms for the transition
+}
